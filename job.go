@@ -132,10 +132,12 @@ func (j *Job) GetBuild(ctx context.Context, id int64) (*Build, error) {
 		return nil, err
 	}
 
-	newRequester := &Requester{Base: jenkinsBaseURL.Host, SslVerify: true, Client: j.Jenkins.Requester.Client}
+	baseHost := fmt.Sprintf("%s://%s", jenkinsBaseURL.Scheme, jenkinsBaseURL.Host)
+
+	newRequester := &Requester{Base: baseHost, SslVerify: true, Client: j.Jenkins.Requester.Client}
 
 	jenkinsWithNewBase := &Jenkins{
-		Server:    jenkinsBaseURL.Host,
+		Server:    baseHost,
 		Version:   j.Jenkins.Version,
 		Raw:       j.Jenkins.Raw,
 		Requester: newRequester,
