@@ -122,21 +122,25 @@ func (j *Job) GetDetails() *JobResponse {
 
 func (j *Job) GetBuild(ctx context.Context, id int64) (*Build, error) {
 	// use job embedded URL to properly handle jobs in folders
-	url, err := url.Parse(j.Raw.URL)
+	addrURL, err := url.Parse(j.Raw.URL)
 	if err != nil {
 		return nil, err
 	}
-	jobURL := url.Path
+	jobURL := addrURL.Path
 	jenkinsBaseURL, err := url.Parse(j.Jenkins.Server)
 	if err != nil {
 		return nil, err
 	}
+
+	newRequester := &Requester{Base: jenkinsBaseURL.Host, SslVerify: true, Client: j.Jenkins.Requester.Client}
+
 	jenkinsWithNewBase := &Jenkins{
 		Server:    jenkinsBaseURL.Host,
 		Version:   j.Jenkins.Version,
 		Raw:       j.Jenkins.Raw,
-		Requester: j.Jenkins.Requester,
+		Requester: newRequester,
 	}
+
 	build := Build{Jenkins: jenkinsWithNewBase, Job: j, Raw: new(BuildResponse), Depth: 1, Base: jobURL + "/" + strconv.FormatInt(id, 10)}
 	status, err := build.Poll(ctx)
 	if err != nil {
