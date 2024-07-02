@@ -132,7 +132,7 @@ func (j *Job) GetBuild(ctx context.Context, id int64) (*Build, error) {
 		return nil, err
 	}
 	jenkinsWithBase := &Jenkins{
-		Server:    serverInfo.Host,
+		Server:    serverInfo.Scheme + serverInfo.Host,
 		Version:   j.Jenkins.Version,
 		Raw:       j.Jenkins.Raw,
 		Requester: j.Jenkins.Requester,
